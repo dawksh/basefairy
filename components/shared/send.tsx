@@ -11,20 +11,21 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { useState } from 'react'
-import { useEnsAddress, useWriteContract } from 'wagmi'
+import { useWriteContract } from 'wagmi'
 import { baseRegistrar } from '@/lib/abis'
 import { toast } from '@/hooks/use-toast'
 import { ToastAction } from '../ui/toast'
-import { getAddress, isAddress, parseEther, stringToBytes } from 'viem'
+import { getAddress, isAddress, parseEther, } from 'viem'
+import { useNameOrAddress } from '@/hooks/useNameOrAddress'
+import { useDebounce } from 'use-debounce'
 
 
 export default function SendDialog({ name }: { name: string }) {
     const [duration, setDuration] = useState(1);
     const [address, setAddress] = useState("")
     const { writeContractAsync } = useWriteContract()
-    const { data } = useEnsAddress({
-        name: address
-    })
+    const [debouncedAddress] = useDebounce(address, 1000)
+    const { data: nameOrAddress } = useNameOrAddress(debouncedAddress)
     const COST = (length: number) => {
         if (length == 3) {
             return 0.1
@@ -36,12 +37,12 @@ export default function SendDialog({ name }: { name: string }) {
         }
     }
     const onSubmit = async () => {
-        const ownerAddress = address.startsWith("0x") ? isAddress(address) ? getAddress(address) : data : data
+        const ownerAddress = address.startsWith("0x") ? isAddress(address) ? getAddress(address) : nameOrAddress?.address : nameOrAddress?.address
         const hash = await writeContractAsync({
-            address: ownerAddress as `0x${string}`,
+            address: baseRegistrar.address as `0x${string}`,
             abi: baseRegistrar.abi,
             functionName: 'register',
-            args: [[name, address, duration * 31557600, "0xC6d566A56A1aFf6508b41f6c90ff131615583BCD", [], true]],
+            args: [[name, ownerAddress, duration * 31557600, baseRegistrar.resolver, [], true]],
             value: parseEther(COST(String(name).length).toString())
         })
         toast({
