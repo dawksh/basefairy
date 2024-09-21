@@ -10,7 +10,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useWriteContract } from 'wagmi'
 import { baseRegistrar } from '@/lib/abis'
 import { toast } from '@/hooks/use-toast'
@@ -19,25 +19,25 @@ import { getAddress, isAddress, parseEther, } from 'viem'
 import { useNameOrAddress } from '@/hooks/useNameOrAddress'
 import { useDebounce } from 'use-debounce'
 
+const COST = (length: number) => {
+    if (length == 3) {
+        return 0.1
+    }
+    if (length == 4) {
+        return 0.01
+    } else {
+        return 0.001
+    }
+}
 
 export default function SendDialog({ name }: { name: string }) {
     const [duration, setDuration] = useState(1);
     const [address, setAddress] = useState("")
     const { writeContractAsync } = useWriteContract()
     const [debouncedAddress] = useDebounce(address, 1000)
-    const { data: nameOrAddress, isFetching } = useNameOrAddress(debouncedAddress)
-    const COST = (length: number) => {
-        if (length == 3) {
-            return 0.1
-        }
-        if (length == 4) {
-            return 0.01
-        } else {
-            return 0.001
-        }
-    }
+    const { data: nameOrAddress, isSuccess } = useNameOrAddress(debouncedAddress)
     const onSubmit = async () => {
-        const ownerAddress = address.startsWith("0x") ? isAddress(address) ? getAddress(address) : nameOrAddress?.address : nameOrAddress?.address
+        const ownerAddress = nameOrAddress?.address
         const hash = await writeContractAsync({
             address: baseRegistrar.address as `0x${string}`,
             abi: baseRegistrar.abi,
@@ -96,7 +96,7 @@ export default function SendDialog({ name }: { name: string }) {
                     <Label htmlFor="duration" className="text-left">
                         cost: <span>{(duration * COST(String(name).length)).toFixed(5)} ETH</span>
                     </Label>
-                    <Button type="submit" onClick={onSubmit} disabled={isFetching || address == ""} >gift 🎁</Button>
+                    <Button type="submit" onClick={onSubmit} disabled={!isSuccess} >gift 🎁</Button>
                 </DialogContent>
             </Dialog>
         </div>

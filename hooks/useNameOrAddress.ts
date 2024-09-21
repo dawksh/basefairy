@@ -19,5 +19,6 @@ export const useNameOrAddress = (addressOrName: string) => {
     return useQuery({
         queryKey: ["addressOrName", addressOrName],
         queryFn: fetchNameOrAddress,
+        enabled: !!addressOrName
     })
 }
