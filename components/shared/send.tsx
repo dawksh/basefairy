@@ -25,7 +25,7 @@ export default function SendDialog({ name }: { name: string }) {
     const [address, setAddress] = useState("")
     const { writeContractAsync } = useWriteContract()
     const [debouncedAddress] = useDebounce(address, 1000)
-    const { data: nameOrAddress } = useNameOrAddress(debouncedAddress)
+    const { data: nameOrAddress, isFetching } = useNameOrAddress(debouncedAddress)
     const COST = (length: number) => {
         if (length == 3) {
             return 0.1
@@ -96,7 +96,7 @@ export default function SendDialog({ name }: { name: string }) {
                     <Label htmlFor="duration" className="text-left">
                         cost: <span>{(duration * COST(String(name).length)).toFixed(5)} ETH</span>
                     </Label>
-                    <Button type="submit" onClick={onSubmit}>gift 🎁</Button>
+                    <Button type="submit" onClick={onSubmit} disabled={isFetching || address == ""} >gift 🎁</Button>
                 </DialogContent>
             </Dialog>
         </div>
