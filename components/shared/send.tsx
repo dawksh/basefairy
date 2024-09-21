@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button'
 import {
     Dialog,
     DialogContent,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -10,12 +9,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useWriteContract } from 'wagmi'
 import { baseRegistrar } from '@/lib/abis'
 import { toast } from '@/hooks/use-toast'
 import { ToastAction } from '../ui/toast'
-import { getAddress, isAddress, parseEther, } from 'viem'
+import { parseEther, } from 'viem'
 import { useNameOrAddress } from '@/hooks/useNameOrAddress'
 import { useDebounce } from 'use-debounce'
 
