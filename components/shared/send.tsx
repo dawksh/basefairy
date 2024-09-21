@@ -11,11 +11,20 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { useState } from 'react'
+import { useEnsAddress, useWriteContract } from 'wagmi'
+import { baseRegistrar } from '@/lib/abis'
+import { toast } from '@/hooks/use-toast'
+import { ToastAction } from '../ui/toast'
+import { getAddress, isAddress, parseEther, stringToBytes } from 'viem'
 
 
 export default function SendDialog({ name }: { name: string }) {
     const [duration, setDuration] = useState(1);
     const [address, setAddress] = useState("")
+    const { writeContractAsync } = useWriteContract()
+    const { data } = useEnsAddress({
+        name: address
+    })
     const COST = (length: number) => {
         if (length == 3) {
             return 0.1
@@ -25,6 +34,20 @@ export default function SendDialog({ name }: { name: string }) {
         } else {
             return 0.001
         }
+    }
+    const onSubmit = async () => {
+        const ownerAddress = address.startsWith("0x") ? isAddress(address) ? getAddress(address) : data : data
+        const hash = await writeContractAsync({
+            address: ownerAddress as `0x${string}`,
+            abi: baseRegistrar.abi,
+            functionName: 'register',
+            args: [[name, address, duration * 31557600, "0xC6d566A56A1aFf6508b41f6c90ff131615583BCD", [], true]],
+            value: parseEther(COST(String(name).length).toString())
+        })
+        toast({
+            title: "tranaction sent!",
+            action: <ToastAction onClick={() => window.open(`https://basescan.org/tx/${hash}`)} altText='showTxn'>goto txn</ToastAction>
+        })
     }
     return (
         <div>
@@ -72,7 +95,7 @@ export default function SendDialog({ name }: { name: string }) {
                     <Label htmlFor="duration" className="text-left">
                         cost: <span>{(duration * COST(String(name).length)).toFixed(5)} ETH</span>
                     </Label>
-                    <Button type="submit">gift 🎁</Button>
+                    <Button type="submit" onClick={onSubmit}>gift 🎁</Button>
                 </DialogContent>
             </Dialog>
         </div>
