@@ -1,6 +1,6 @@
 export const baseRegistrar = {
-    address: "0x49ae3cc2e3aa768b1e5654f5d3c6002144a59581",
-    resolver: "0x6533C94869D28fAA8dF77cc63f9e2b2D6Cf77eBA",
+    address: "0x4cCb0BB02FCABA27e82a56646E81d8c5bC4119a5",
+    resolver: "0xC6d566A56A1aFf6508b41f6c90ff131615583BCD",
     abi: [
         {
             inputs: [
@@ -1527,17 +1527,6 @@ export const L2Resolver = {
                 { internalType: "bytes", name: "data", type: "bytes" },
             ],
             name: "setABI",
-            outputs: [],
-            stateMutability: "nonpayable",
-            type: "function",
-        },
-        {
-            inputs: [
-                { internalType: "bytes32", name: "node", type: "bytes32" },
-                { internalType: "uint256", name: "coinType", type: "uint256" },
-                { internalType: "bytes", name: "a", type: "bytes" },
-            ],
-            name: "setAddr",
             outputs: [],
             stateMutability: "nonpayable",
             type: "function",
