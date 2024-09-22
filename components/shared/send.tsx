@@ -40,7 +40,7 @@ export default function SendDialog({ name }: { name: string }) {
         const addressData = encodeFunctionData({
             abi: L2Resolver.abi,
             functionName: 'setAddr',
-            args: [namehash(name + ".base.eth"), debouncedAddress],
+            args: [namehash(name + ".base.eth"), nameOrAddress?.address],
         });
 
         const nameData = encodeFunctionData({
