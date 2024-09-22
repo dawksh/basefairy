@@ -11,10 +11,10 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { useState } from 'react'
 import { useWriteContract } from 'wagmi'
-import { baseRegistrar } from '@/lib/abis'
+import { baseRegistrar, L2Resolver } from '@/lib/abis'
 import { toast } from '@/hooks/use-toast'
 import { ToastAction } from '../ui/toast'
-import { parseEther, } from 'viem'
+import { encodeFunctionData, namehash, parseEther, } from 'viem'
 import { useNameOrAddress } from '@/hooks/useNameOrAddress'
 import { useDebounce } from 'use-debounce'
 
@@ -37,11 +37,22 @@ export default function SendDialog({ name }: { name: string }) {
     const { data: nameOrAddress, isSuccess } = useNameOrAddress(debouncedAddress)
     const onSubmit = async () => {
         const ownerAddress = nameOrAddress?.address
+        const addressData = encodeFunctionData({
+            abi: L2Resolver.abi,
+            functionName: 'setAddr',
+            args: [namehash(name + ".base.eth"), debouncedAddress],
+        });
+
+        const nameData = encodeFunctionData({
+            abi: L2Resolver.abi,
+            functionName: 'setName',
+            args: [namehash(name + ".base.eth"), name + ".base.eth"],
+        });
         const hash = await writeContractAsync({
             address: baseRegistrar.address as `0x${string}`,
             abi: baseRegistrar.abi,
             functionName: 'register',
-            args: [[name, ownerAddress, duration * 31557600, baseRegistrar.resolver, [], true]],
+            args: [[name, ownerAddress, duration * 31557600, baseRegistrar.resolver, [addressData, nameData], false]],
             value: parseEther(COST(String(name).length).toString())
         })
         toast({

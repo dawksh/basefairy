@@ -9,7 +9,7 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import {
-    base,
+    baseSepolia,
 } from 'wagmi/chains';
 import {
     QueryClientProvider,
@@ -21,7 +21,7 @@ export default function RainbowKitLayout({ children }: { children: ReactNode }) 
     const config = getDefaultConfig({
         appName: 'basefairy',
         projectId: String(process.env.NEXT_PUBLIC_PROJECT_ID),
-        chains: [base],
+        chains: [baseSepolia],
         ssr: false,
     });
     const queryClient = new QueryClient();
